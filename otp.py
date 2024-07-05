@@ -21,7 +21,8 @@ def log_time(func):
         start_time = time.time()
         result = func(*args, **kwargs)
         end_time = time.time()
-        logging.info(f"{func.__name__} took {end_time - start_time:.2f} seconds")
+        logging.info(
+            f"{func.__name__} took {end_time - start_time:.2f} seconds")
         return result
     return wrapper
 
@@ -48,65 +49,62 @@ def instagram_login(username, password, cookie_path="cookies.pkl"):
     if os.path.exists(cookie_path):
         load_cookies(driver, cookie_path)
         driver.refresh()
-        # WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[text()='Reload page']")))
     else:
         driver.get("https://www.instagram.com/accounts/login/")
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "username")))
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.NAME, "username")))
 
-        # Find and fill the username field
         username_field = driver.find_element(By.NAME, "username")
         username_field.send_keys(username)
 
-        # Find and fill the password field
         password_field = driver.find_element(By.NAME, "password")
         password_field.send_keys(password)
         password_field.send_keys(Keys.RETURN)
 
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[text()='Direct']")))
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//div[text()='Direct']")))
         save_cookies(driver, cookie_path)
         driver.get("https://www.instagram.com/direct/")
 
-    # Navigate to Direct Messages
-
     return driver
+
 
 @log_time
 def send_otp(driver, recipient_username, otp):
-    # Turn off notifications if the pop-up appears
     try:
-        turn_off_notifications_button = WebDriverWait(driver, 10).until(
+        turn_off_notifications_button = WebDriverWait(driver, 5).until(
             EC.element_to_be_clickable((By.XPATH, "//button[text()='Not Now']")))
         turn_off_notifications_button.click()
-    except:
-        pass
+    except Exception as e:
+        logging.warning(f"Failed to turn off notifications: {e}")
 
     try:
-        send_message_button = WebDriverWait(driver, 10).until(
+        send_message_button = WebDriverWait(driver, 5).until(
             EC.element_to_be_clickable((By.XPATH, "//div[text()='Send message']")))
         send_message_button.click()
-    except:
-        pass
+    except Exception as e:
+        logging.warning(f"Failed to find/send message button: {e}")
 
-    # Find input with name queryBox
-    query_box = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "queryBox")))
-    query_box.send_keys(recipient_username)
-    
-    # Find and click the contact search result checkbox
-    contact_search_result_checkbox = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.NAME, "ContactSearchResultCheckbox")))
-    contact_search_result_checkbox.click()
+    try:
+        query_box = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.NAME, "queryBox")))
+        query_box.send_keys(recipient_username)
 
-    # Find and click the Chat button
-    chat_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='Chat']")))
-    chat_button.click()
+        contact_search_result_checkbox = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.NAME, "ContactSearchResultCheckbox")))
+        contact_search_result_checkbox.click()
 
-    # Find the message box and send the OTP
-    message_box = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@aria-describedby='Message']")))
-    message_box.click()
-    message_box.send_keys(f"Your OTP is: {otp}")
-    message_box.send_keys(Keys.RETURN)
+        chat_button = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, "//div[text()='Chat']")))
+        chat_button.click()
 
-    time.sleep(1)
+        message_box = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.XPATH, "//div[@aria-describedby='Message']")))
+        message_box.click()
+        message_box.send_keys(f"Your OTP is: {otp}")
+        message_box.send_keys(Keys.RETURN)
+    except Exception as e:
+        logging.error(f"Failed to send OTP: {e}")
 
 
 def generate_otp(length=6):
@@ -115,7 +113,6 @@ def generate_otp(length=6):
 
 @log_time
 def main():
-    # read username and password from secrets.txt
     with open("secrets.txt") as file:
         username = file.readline().strip()
         password = file.readline().strip()
