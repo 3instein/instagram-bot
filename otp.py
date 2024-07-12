@@ -120,7 +120,7 @@ def api_send_otp():
 
     response = {
         "message": "OTP sent successfully!",
-        otp: otp
+        "otp": otp
     }
 
     return jsonify(response)
