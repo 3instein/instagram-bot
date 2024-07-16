@@ -148,14 +148,16 @@ def api_check_link():
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h1")))
             caption = driver.find_element(By.XPATH, "//h1")
 
-            #find span with style line-height: var(--base-line-clamp-line-height); --base-line-clamp-line-height: 18px;
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@style='line-height: var(--base-line-clamp-line-height); --base-line-clamp-line-height: 18px;']")))
             username = driver.find_element(By.XPATH, "//span[@style='line-height: var(--base-line-clamp-line-height); --base-line-clamp-line-height: 18px;']")
 
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//time")))
+            time = driver.find_element(By.XPATH, "//time").get_attribute("datetime")
+
             response = {
-                "message": "Post exists!",
                 "username": username.text,
-                "caption": caption.text
+                "caption": caption.text,
+                "time": time
             }
         except:
             pass
