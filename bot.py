@@ -90,6 +90,18 @@ def send_otp(driver, recipient_username, otp):
     chat_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='Chat']")))
     chat_button.click()
 
+    try:
+    # check span with text You can send more messages after your invite is accepted.
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[text()='You can send more messages after your invite is accepted.']")))
+        response = {
+            "message": "You need to accept DM from us."
+        }
+
+        return jsonify(response)
+    except:
+        pass
+    
+
     message_box = WebDriverWait(driver, 10).until(EC.presence_of_element_located(
         (By.XPATH, "//div[@aria-describedby='Message']")))
     message_box.click()
