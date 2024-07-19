@@ -39,7 +39,7 @@ def load_cookies(driver, path):
 @log_time
 def instagram_login(username, password, cookie_path="cookies.pkl"):
     options = Options()
-    options.headless = True  # Run in headless mode
+    options.add_argument("--headless=new")
     driver = webdriver.Chrome(options=options)
     driver.get("https://www.instagram.com/direct")
 
