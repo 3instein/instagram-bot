@@ -141,7 +141,7 @@ def api_check_link():
     link = req_data.get('link')
 
     options = Options()
-    options.headless = True
+    options.add_argument("--headless=new")
 
     driver = webdriver.Chrome(options=options)
     driver.get(link)
