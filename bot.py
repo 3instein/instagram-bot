@@ -121,7 +121,7 @@ def api_send_otp():
         password = file.readline().strip()
     username = req_data.get('username')
 
-    otp = generate_otp()
+    otp = req_data.get('otp')
 
     driver = instagram_login(username, password)
     send_otp(driver, username, otp)
@@ -129,7 +129,6 @@ def api_send_otp():
 
     response = {
         "message": "OTP sent successfully!",
-        "otp": otp
     }
 
     return jsonify(response)
